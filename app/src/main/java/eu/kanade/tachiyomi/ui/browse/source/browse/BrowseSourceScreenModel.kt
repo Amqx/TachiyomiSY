@@ -85,7 +85,7 @@ open class BrowseSourceScreenModel(
     private val savedSearch: Long? = null,
     // SY <--
     private val sourceManager: SourceManager = Injekt.get(),
-    sourcePreferences: SourcePreferences = Injekt.get(),
+    private val sourcePreferences: SourcePreferences = Injekt.get(),
     private val libraryPreferences: LibraryPreferences = Injekt.get(),
     private val coverCache: CoverCache = Injekt.get(),
     private val getRemoteManga: GetRemoteManga = Injekt.get(),
@@ -139,6 +139,22 @@ open class BrowseSourceScreenModel(
             )
         }
 
+        // SY --> Resolve Home as initial listing when entering from source list
+        val initialHomeType = sourcePreferences.sourceHome(sourceId).get()
+        if ((listingQuery == null || listingQuery == GetRemoteManga.QUERY_POPULAR) &&
+            savedSearch == null && filtersJson == null
+        ) {
+            mutableState.update {
+                it.copy(
+                    listing = resolveHomeListing(initialHomeType),
+                    homeType = initialHomeType,
+                )
+            }
+        } else {
+            mutableState.update { it.copy(homeType = initialHomeType) }
+        }
+        // SY <--
+
         if (!getIncognitoState.await(source.id)) {
             sourcePreferences.lastUsedSource.set(source.id)
         }
@@ -160,10 +176,24 @@ open class BrowseSourceScreenModel(
             }
         }
 
+        var isFirstEmission = true
         getExhSavedSearch.subscribe(source.id, source::getFilterList)
             .map { it.sortedWith(compareBy(String.CASE_INSENSITIVE_ORDER, EXHSavedSearch::name)) }
             .onEach { savedSearches ->
-                mutableState.update { it.copy(savedSearches = savedSearches) }
+                mutableState.update { state ->
+                    val newState = state.copy(savedSearches = savedSearches)
+                    // Re-resolve Home on first emission if Home is set to a saved search
+                    if (isFirstEmission &&
+                        state.listing is Listing.Home &&
+                        state.homeType.startsWith(SourcePreferences.HOME_TYPE_SAVED_SEARCH_PREFIX)
+                    ) {
+                        isFirstEmission = false
+                        newState.copy(listing = resolveHomeListing(state.homeType, savedSearches))
+                    } else {
+                        isFirstEmission = false
+                        newState
+                    }
+                }
             }
             .launchIn(screenModelScope)
         // SY <--
@@ -224,6 +254,68 @@ open class BrowseSourceScreenModel(
     fun resetFilters() {
         mutableState.update { it.copy(filters = source.getFilterList()) }
     }
+
+    // SY -->
+    fun resolveHomeListing(
+        homeType: String = state.value.homeType,
+        savedSearches: List<EXHSavedSearch> = state.value.savedSearches,
+    ): Listing {
+        return when {
+            homeType == SourcePreferences.HOME_TYPE_LATEST &&
+                source.supportsLatest -> {
+                Listing.Home(
+                    query = GetRemoteManga.QUERY_LATEST,
+                    filters = FilterList(),
+                )
+            }
+            homeType.startsWith(SourcePreferences.HOME_TYPE_SAVED_SEARCH_PREFIX) -> {
+                val searchId = homeType.removePrefix(SourcePreferences.HOME_TYPE_SAVED_SEARCH_PREFIX).toLongOrNull()
+                val search = savedSearches.firstOrNull { it.id == searchId }
+                if (search != null) {
+                    val filters = search.filterList ?: source.getFilterList()
+                    Listing.Home(
+                        query = search.query,
+                        filters = filters,
+                    )
+                } else if (savedSearches.isEmpty()) {
+                    // Saved searches not loaded yet, show Popular as placeholder
+                    Listing.Home(
+                        query = GetRemoteManga.QUERY_POPULAR,
+                        filters = FilterList(),
+                    )
+                } else {
+                    // Saved search was deleted, fall back to Popular
+                    sourcePreferences.sourceHome(sourceId).set(SourcePreferences.HOME_TYPE_POPULAR)
+                    Listing.Home(
+                        query = GetRemoteManga.QUERY_POPULAR,
+                        filters = FilterList(),
+                    )
+                }
+            }
+            else -> {
+                // Default: Popular
+                Listing.Home(
+                    query = GetRemoteManga.QUERY_POPULAR,
+                    filters = FilterList(),
+                )
+            }
+        }
+    }
+
+    fun openSelectHomeDialog() {
+        setDialog(Dialog.SelectHome)
+    }
+
+    fun setHomeType(homeType: String) {
+        val previousType = sourcePreferences.sourceHome(sourceId).get()
+        sourcePreferences.sourceHome(sourceId).set(homeType)
+        setDialog(null)
+        mutableState.update { it.copy(homeType = homeType) }
+        if (homeType != previousType && state.value.listing is Listing.Home) {
+            mutableState.update { it.copy(listing = resolveHomeListing()) }
+        }
+    }
+    // SY <--
 
     fun setListing(listing: Listing) {
         mutableState.update { it.copy(listing = listing, toolbarQuery = null) }
@@ -409,6 +501,10 @@ open class BrowseSourceScreenModel(
     }
 
     sealed class Listing(open val query: String?, open val filters: FilterList) {
+        data class Home(
+            override val query: String?,
+            override val filters: FilterList,
+        ) : Listing(query = query, filters = filters)
         data object Popular : Listing(query = GetRemoteManga.QUERY_POPULAR, filters = FilterList())
         data object Latest : Listing(query = GetRemoteManga.QUERY_LATEST, filters = FilterList())
         data class Search(
@@ -440,6 +536,7 @@ open class BrowseSourceScreenModel(
         // SY -->
         data class DeleteSavedSearch(val idToDelete: Long, val name: String) : Dialog
         data class CreateSavedSearch(val currentSavedSearches: List<String>) : Dialog
+        data object SelectHome : Dialog
         // SY <--
     }
 
@@ -452,9 +549,14 @@ open class BrowseSourceScreenModel(
         // SY -->
         val savedSearches: List<EXHSavedSearch> = emptyList(),
         val filterable: Boolean = true,
+        val homeType: String = SourcePreferences.HOME_TYPE_POPULAR,
         // SY <--
     ) {
         val isUserQuery get() = listing is Listing.Search && !listing.query.isNullOrEmpty()
+
+        // SY -->
+        val isHomeCustomized get() = homeType != SourcePreferences.HOME_TYPE_POPULAR
+        // SY <--
     }
 
     // EXH -->

@@ -23,6 +23,7 @@ import eu.kanade.tachiyomi.source.Source
 import exh.source.anyIs
 import tachiyomi.domain.library.model.LibraryDisplayMode
 import tachiyomi.i18n.MR
+import tachiyomi.i18n.sy.SYMR
 import tachiyomi.presentation.core.i18n.stringResource
 import tachiyomi.source.local.LocalSource
 
@@ -37,6 +38,7 @@ fun BrowseSourceToolbar(
     onWebViewClick: () -> Unit,
     onHelpClick: () -> Unit,
     onSettingsClick: () -> Unit,
+    onSelectHome: () -> Unit,
     onSearch: (String) -> Unit,
     scrollBehavior: TopAppBarScrollBehavior? = null,
 ) {
@@ -70,6 +72,14 @@ fun BrowseSourceToolbar(
                             ),
                         )
                     }
+                    // SY -->
+                    add(
+                        AppBar.OverflowAction(
+                            title = stringResource(SYMR.strings.select_home),
+                            onClick = onSelectHome,
+                        ),
+                    )
+                    // SY <--
                     if (isLocalSource) {
                         if (isConfigurableSource && displayMode != null) {
                             add(
