@@ -10,7 +10,7 @@ import tachiyomi.core.common.preference.getLongArray
 import tachiyomi.domain.library.model.LibraryDisplayMode
 
 class SourcePreferences(
-    preferenceStore: PreferenceStore,
+    private val preferenceStore: PreferenceStore,
 ) {
 
     val sourceDisplayMode: Preference<LibraryDisplayMode> = preferenceStore.getObjectFromString(
@@ -63,6 +63,13 @@ class SourcePreferences(
         Preference.appStateKey("has_filters_toggle_state"),
         false,
     )
+
+    // SY -->
+    fun sourceHome(sourceId: Long): Preference<String> = preferenceStore.getString(
+        "source_home_$sourceId",
+        HOME_TYPE_POPULAR,
+    )
+    // SY <--
 
     // SY -->
     val enableSourceBlacklist: Preference<Boolean> = preferenceStore.getBoolean("eh_enable_source_blacklist", true)
@@ -131,4 +138,12 @@ class SourcePreferences(
         "migration_hide_without_updates",
         false,
     )
+
+    // SY -->
+    companion object {
+        const val HOME_TYPE_POPULAR = "popular"
+        const val HOME_TYPE_LATEST = "latest"
+        const val HOME_TYPE_SAVED_SEARCH_PREFIX = "saved_search_"
+    }
+    // SY <--
 }

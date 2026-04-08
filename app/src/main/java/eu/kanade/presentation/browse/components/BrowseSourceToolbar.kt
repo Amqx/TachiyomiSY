@@ -24,6 +24,7 @@ import exh.source.anyIs
 import kotlinx.collections.immutable.persistentListOf
 import tachiyomi.domain.library.model.LibraryDisplayMode
 import tachiyomi.i18n.MR
+import tachiyomi.i18n.sy.SYMR
 import tachiyomi.presentation.core.i18n.stringResource
 import tachiyomi.source.local.LocalSource
 
@@ -38,6 +39,7 @@ fun BrowseSourceToolbar(
     onWebViewClick: () -> Unit,
     onHelpClick: () -> Unit,
     onSettingsClick: () -> Unit,
+    onSelectHome: () -> Unit,
     onSearch: (String) -> Unit,
     scrollBehavior: TopAppBarScrollBehavior? = null,
 ) {
@@ -72,42 +74,29 @@ fun BrowseSourceToolbar(
                                 ),
                             )
                         }
-                        if (isLocalSource) {
-                            if (isConfigurableSource && displayMode != null) {
-                                add(
-                                    AppBar.OverflowAction(
-                                        title = stringResource(MR.strings.label_help),
-                                        onClick = onHelpClick,
-                                    ),
-                                )
-                            } else {
-                                add(
-                                    AppBar.Action(
-                                        title = stringResource(MR.strings.label_help),
-                                        icon = Icons.AutoMirrored.Outlined.Help,
-                                        onClick = onHelpClick,
-                                    ),
-                                )
-                            }
-                        } else {
-                            if (isConfigurableSource && displayMode != null) {
-                                add(
-                                    AppBar.OverflowAction(
-                                        title = stringResource(MR.strings.action_web_view),
-                                        onClick = onWebViewClick,
-                                    ),
-                                )
-                            } else {
-                                add(
-                                    AppBar.Action(
-                                        title = stringResource(MR.strings.action_web_view),
-                                        icon = Icons.Outlined.Public,
-                                        onClick = onWebViewClick,
-                                    ),
-                                )
-                            }
-                        }
+                        // SY -->
+                        add(
+                            AppBar.OverflowAction(
+                                title = stringResource(SYMR.strings.select_home),
+                                onClick = onSelectHome,
+                            ),
+                        )
                         // SY <--
+                        if (isLocalSource) {
+                            add(
+                                AppBar.OverflowAction(
+                                    title = stringResource(MR.strings.label_help),
+                                    onClick = onHelpClick,
+                                ),
+                            )
+                        } else {
+                            add(
+                                AppBar.OverflowAction(
+                                    title = stringResource(MR.strings.action_web_view),
+                                    onClick = onWebViewClick,
+                                ),
+                            )
+                        }
                         if (isConfigurableSource) {
                             add(
                                 AppBar.OverflowAction(

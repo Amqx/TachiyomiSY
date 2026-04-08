@@ -9,8 +9,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Favorite
+import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.outlined.FilterList
+import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.NewReleases
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FilterChipDefaults
@@ -42,6 +43,7 @@ import eu.kanade.presentation.browse.components.BrowseSourceToolbar
 import eu.kanade.presentation.browse.components.RemoveMangaDialog
 import eu.kanade.presentation.browse.components.SavedSearchCreateDialog
 import eu.kanade.presentation.browse.components.SavedSearchDeleteDialog
+import eu.kanade.presentation.browse.components.SelectHomeDialog
 import eu.kanade.presentation.category.components.ChangeCategoryDialog
 import eu.kanade.presentation.manga.DuplicateMangaDialog
 import eu.kanade.presentation.util.AssistContentScreen
@@ -66,6 +68,7 @@ import tachiyomi.core.common.Constants
 import tachiyomi.core.common.util.lang.launchIO
 import tachiyomi.domain.source.model.StubSource
 import tachiyomi.i18n.MR
+import tachiyomi.i18n.sy.SYMR
 import tachiyomi.presentation.core.components.material.Scaffold
 import tachiyomi.presentation.core.components.material.padding
 import tachiyomi.presentation.core.i18n.stringResource
@@ -163,6 +166,7 @@ data class BrowseSourceScreen(
                         onWebViewClick = onWebViewClick,
                         onHelpClick = onHelpClick,
                         onSettingsClick = { navigator.push(SourcePreferencesScreen(sourceId)) },
+                        onSelectHome = screenModel::openSelectHomeDialog,
                         onSearch = screenModel::search,
                     )
 
@@ -172,24 +176,38 @@ data class BrowseSourceScreen(
                             .padding(horizontal = MaterialTheme.padding.small),
                         horizontalArrangement = Arrangement.spacedBy(MaterialTheme.padding.small),
                     ) {
+                        // SY -->
                         FilterChip(
-                            selected = state.listing == Listing.Popular,
+                            selected = state.listing is Listing.Home,
                             onClick = {
                                 screenModel.resetFilters()
-                                screenModel.setListing(Listing.Popular)
+                                screenModel.setListing(screenModel.resolveHomeListing())
                             },
                             leadingIcon = {
                                 Icon(
-                                    imageVector = Icons.Outlined.Favorite,
+                                    imageVector = Icons.Outlined.Home,
                                     contentDescription = null,
                                     modifier = Modifier
                                         .size(FilterChipDefaults.IconSize),
                                 )
                             },
+                            trailingIcon = if (state.isHomeCustomized) {
+                                {
+                                    Icon(
+                                        imageVector = Icons.Filled.Star,
+                                        contentDescription = null,
+                                        modifier = Modifier
+                                            .size(FilterChipDefaults.IconSize),
+                                    )
+                                }
+                            } else {
+                                null
+                            },
                             label = {
-                                Text(text = stringResource(MR.strings.popular))
+                                Text(text = stringResource(SYMR.strings.browse_home))
                             },
                         )
+                        // SY <--
                         if ((screenModel.source as CatalogueSource).supportsLatest) {
                             FilterChip(
                                 selected = state.listing == Listing.Latest,
@@ -365,6 +383,13 @@ data class BrowseSourceScreen(
                 deleteSavedSearch = {
                     screenModel.deleteSearch(dialog.idToDelete)
                 },
+            )
+            is BrowseSourceScreenModel.Dialog.SelectHome -> SelectHomeDialog(
+                onDismissRequest = onDismissRequest,
+                currentHomeType = state.homeType,
+                supportsLatest = (screenModel.source as? CatalogueSource)?.supportsLatest == true,
+                savedSearches = state.savedSearches,
+                onSelectHomeType = screenModel::setHomeType,
             )
             else -> {}
         }
