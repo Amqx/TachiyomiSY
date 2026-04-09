@@ -73,7 +73,12 @@ fun Screen.sourcesTab(
                     val screen = when {
                         smartSearchConfig != null -> SmartSearchScreen(source.id, smartSearchConfig)
                         listing == Listing.Popular && screenModel.useNewSourceNavigation -> SourceFeedScreen(source.id)
-                        else -> BrowseSourceScreen(source.id, listing.query)
+                        // Pass null for the default source tap so the Home preference is applied;
+                        // the Latest button still passes QUERY_LATEST to force explicit Latest.
+                        else -> BrowseSourceScreen(
+                            source.id,
+                            listing.query.takeUnless { listing == Listing.Popular },
+                        )
                     }
                     navigator.push(screen)
                     // SY <--
