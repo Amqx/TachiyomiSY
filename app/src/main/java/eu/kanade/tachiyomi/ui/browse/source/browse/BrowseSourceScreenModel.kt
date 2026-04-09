@@ -147,9 +147,7 @@ open class BrowseSourceScreenModel(
 
         // SY --> Resolve Home as initial listing when entering from source list
         val initialHomeType = sourcePreferences.sourceHome(sourceId).get()
-        if ((listingQuery == null || listingQuery == GetRemoteManga.QUERY_POPULAR) &&
-            savedSearch == null && filtersJson == null
-        ) {
+        if (listingQuery == null && savedSearch == null && filtersJson == null) {
             mutableState.update {
                 it.copy(
                     listing = resolveHomeListing(initialHomeType),
@@ -183,21 +181,18 @@ open class BrowseSourceScreenModel(
         }
 
         if (source is CatalogueSource) {
-            var isFirstEmission = true
             getExhSavedSearch.subscribe(source.id, source::getFilterList)
                 .map { it.sortedWith(compareBy(String.CASE_INSENSITIVE_ORDER, EXHSavedSearch::name)) }
                 .onEach { savedSearches ->
                     mutableState.update { state ->
                         val newState = state.copy(savedSearches = savedSearches.toImmutableList())
-                        // Re-resolve Home on first emission if Home is set to a saved search
-                        if (isFirstEmission &&
-                            state.listing is Listing.Home &&
+                        // Always re-resolve Home listing when saved searches change, so deletions and
+                        // initial loads are both handled correctly without a first-emission guard.
+                        if (state.listing is Listing.Home &&
                             state.homeType.startsWith(SourcePreferences.HOME_TYPE_SAVED_SEARCH_PREFIX)
                         ) {
-                            isFirstEmission = false
                             newState.copy(listing = resolveHomeListing(state.homeType, savedSearches))
                         } else {
-                            isFirstEmission = false
                             newState
                         }
                     }
@@ -646,6 +641,13 @@ open class BrowseSourceScreenModel(
     fun deleteSearch(savedSearchId: Long) {
         screenModelScope.launchNonCancellable {
             deleteSavedSearchById.await(savedSearchId)
+            // If the deleted search was set as Home, reset the preference and state immediately
+            // so that a subsequent empty-list DB emission doesn't leave homeType stale.
+            val deletedHomeType = SourcePreferences.HOME_TYPE_SAVED_SEARCH_PREFIX + savedSearchId
+            if (mutableState.value.homeType == deletedHomeType) {
+                sourcePreferences.sourceHome(sourceId).set(SourcePreferences.HOME_TYPE_POPULAR)
+                mutableState.update { it.copy(homeType = SourcePreferences.HOME_TYPE_POPULAR) }
+            }
         }
     }
 
