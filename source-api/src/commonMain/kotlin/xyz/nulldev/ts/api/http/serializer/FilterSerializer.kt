@@ -68,8 +68,30 @@ class FilterSerializer {
     }
 
     fun deserialize(filters: FilterList, json: JsonArray) {
-        filters.filterIsInstance<Filter<Any?>>().zip(json).forEach { (filter, obj) ->
-            deserialize(filter, obj.jsonObject)
+        val currentFilters = filters.filterIsInstance<Filter<Any?>>()
+        val availableSerializers = serializers.filterIsInstance<Serializer<Filter<Any?>>>()
+        val usedIndices = mutableSetOf<Int>()
+
+        json.forEach { jsonElement ->
+            val obj = jsonElement.jsonObject
+            val type = obj[TYPE]?.jsonPrimitive?.content ?: return@forEach
+            val name = obj[NAME]?.jsonPrimitive?.content
+
+            val serializer = availableSerializers.firstOrNull { it.type == type } ?: return@forEach
+
+            // Match filters by class and name rather than by position. Some sources
+            // expose a different filter list structure at different times (e.g. tag
+            // groups that load asynchronously on first use), and a positional zip
+            // would dispatch the wrong serializer to a filter of a different class,
+            // producing ClassCastException and a silently broken saved search.
+            val matchIdx = currentFilters.indices.firstOrNull { idx ->
+                idx !in usedIndices &&
+                    currentFilters[idx]::class.isSubclassOf(serializer.clazz) &&
+                    currentFilters[idx].name == name
+            } ?: return@forEach
+
+            usedIndices += matchIdx
+            deserialize(currentFilters[matchIdx], obj)
         }
     }
 
@@ -107,5 +129,6 @@ class FilterSerializer {
     companion object {
         const val TYPE = "_type"
         const val CLASS_MAPPINGS = "_cmaps"
+        const val NAME = "name"
     }
 }
