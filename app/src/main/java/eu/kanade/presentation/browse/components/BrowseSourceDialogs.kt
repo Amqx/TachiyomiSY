@@ -1,6 +1,9 @@
 package eu.kanade.presentation.browse.components
 
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -14,9 +17,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.window.DialogProperties
+import eu.kanade.domain.source.service.SourcePreferences
+import eu.kanade.presentation.components.RadioMenuItem
 import eu.kanade.tachiyomi.util.system.toast
 import kotlinx.collections.immutable.ImmutableList
 import tachiyomi.domain.manga.model.Manga
+import tachiyomi.domain.source.model.EXHSavedSearch
 import tachiyomi.i18n.MR
 import tachiyomi.i18n.sy.SYMR
 import tachiyomi.presentation.core.i18n.stringResource
@@ -127,6 +133,53 @@ fun SavedSearchCreateDialog(
                 Text(text = stringResource(MR.strings.action_ok))
             }
         },
+        dismissButton = {
+            TextButton(onClick = onDismissRequest) {
+                Text(text = stringResource(MR.strings.action_cancel))
+            }
+        },
+    )
+}
+
+@Composable
+fun SelectHomeDialog(
+    onDismissRequest: () -> Unit,
+    currentHomeType: String,
+    supportsLatest: Boolean,
+    savedSearches: ImmutableList<EXHSavedSearch>,
+    onSelectHomeType: (String) -> Unit,
+) {
+    AlertDialog(
+        onDismissRequest = onDismissRequest,
+        title = { Text(text = stringResource(SYMR.strings.select_home)) },
+        text = {
+            Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
+                RadioMenuItem(
+                    text = { Text(text = stringResource(MR.strings.popular)) },
+                    isChecked = currentHomeType == SourcePreferences.HOME_TYPE_POPULAR,
+                ) {
+                    onSelectHomeType(SourcePreferences.HOME_TYPE_POPULAR)
+                }
+                if (supportsLatest) {
+                    RadioMenuItem(
+                        text = { Text(text = stringResource(MR.strings.latest)) },
+                        isChecked = currentHomeType == SourcePreferences.HOME_TYPE_LATEST,
+                    ) {
+                        onSelectHomeType(SourcePreferences.HOME_TYPE_LATEST)
+                    }
+                }
+                savedSearches.forEach { search ->
+                    val searchType = "${SourcePreferences.HOME_TYPE_SAVED_SEARCH_PREFIX}${search.id}"
+                    RadioMenuItem(
+                        text = { Text(text = search.name) },
+                        isChecked = currentHomeType == searchType,
+                    ) {
+                        onSelectHomeType(searchType)
+                    }
+                }
+            }
+        },
+        confirmButton = {},
         dismissButton = {
             TextButton(onClick = onDismissRequest) {
                 Text(text = stringResource(MR.strings.action_cancel))

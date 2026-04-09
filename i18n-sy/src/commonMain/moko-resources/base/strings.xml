@@ -744,4 +744,8 @@
 
     <!-- Humanize time -->
     <string name="humanize_fallback">moments ago</string>
+
+    <!-- Browse source home -->
+    <string name="browse_home">Home</string>
+    <string name="select_home">Select Home Page</string>
 </resources>
