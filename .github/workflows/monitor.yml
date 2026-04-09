@@ -1,0 +1,118 @@
+name: Monitor TachiyomiSY Commits
+
+on:
+  schedule:
+    - cron: '0 * * * *'    # Every hour
+  workflow_dispatch:       # Allow manual runs for testing
+
+jobs:
+  check-commits:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Fetch new commits since last seen SHA
+        id: fetch
+        run: |
+          LAST_SHA="${{ vars.LAST_SEEN_SHA }}"
+
+          # Get the list of commits on master, up to 50 (more than enough for an hour)
+          ALL_COMMITS=$(curl -s \
+            "https://api.github.com/repos/jobobby04/TachiyomiSY/commits?sha=master&per_page=50")
+
+          # If no last SHA stored yet, just grab the latest one to bootstrap
+          if [ -z "$LAST_SHA" ]; then
+            BOOTSTRAP_SHA=$(echo "$ALL_COMMITS" | jq -r '.[0].sha')
+            echo "new_commits=[]" >> $GITHUB_OUTPUT
+            echo "latest_sha=$BOOTSTRAP_SHA" >> $GITHUB_OUTPUT
+            echo "Bootstrapping with SHA $BOOTSTRAP_SHA — no notification sent."
+            exit 0
+          fi
+
+          # Collect all commits that come after LAST_SHA (newer commits appear first in the array)
+          NEW_COMMITS=$(echo "$ALL_COMMITS" | jq --arg last "$LAST_SHA" '
+            . as $all |
+            ($all | map(.sha) | index($last)) as $idx |
+            if $idx == null then .[0:1]   # Fallback: only notify about the latest if history is ambiguous
+            elif $idx == 0 then []         # No new commits
+            else .[:$idx]                  # Everything newer than last seen
+            end |
+            reverse                        # Chronological order (oldest first)
+          ')
+
+          COUNT=$(echo "$NEW_COMMITS" | jq 'length')
+
+          if [ "$COUNT" -eq 0 ]; then
+            echo "new_commits=[]" >> $GITHUB_OUTPUT
+            echo "latest_sha=$LAST_SHA" >> $GITHUB_OUTPUT
+            echo "No new commits."
+            exit 0
+          fi
+
+          # Get the latest SHA to store after this run
+          LATEST_SHA=$(echo "$ALL_COMMITS" | jq -r '.[0].sha')
+
+          echo "new_commits=$(echo "$NEW_COMMITS" | jq -c '.')" >> $GITHUB_OUTPUT
+          echo "latest_sha=$LATEST_SHA" >> $GITHUB_OUTPUT
+          echo "Found $COUNT new commit(s)."
+
+      - name: Send Discord webhooks
+        if: steps.fetch.outputs.new_commits != '[]'
+        run: |
+          echo '${{ steps.fetch.outputs.new_commits }}' | jq -c '.[]' | while read -r COMMIT; do
+            SHA=$(echo "$COMMIT" | jq -r '.sha')
+            SHORT_SHA=$(echo "$SHA" | cut -c1-7)
+            MESSAGE=$(echo "$COMMIT" | jq -r '.commit.message | split("\n")[0]')
+            AUTHOR=$(echo "$COMMIT" | jq -r '.commit.author.name')
+            TIMESTAMP=$(echo "$COMMIT" | jq -r '.commit.author.date')
+            URL=$(echo "$COMMIT" | jq -r '.html_url')
+
+            # Fetch diff stats for this specific commit
+            STATS=$(curl -s -H "Accept: application/vnd.github.v3+json" \
+              "https://api.github.com/repos/jobobby04/TachiyomiSY/commits/$SHA")
+            ADDITIONS=$(echo "$STATS" | jq -r '.stats.additions')
+            DELETIONS=$(echo "$STATS" | jq -r '.stats.deletions')
+            FILES_CHANGED=$(echo "$STATS" | jq -r '.files | length')
+
+            PAYLOAD=$(jq -n \
+              --arg short_sha "$SHORT_SHA" \
+              --arg message "$MESSAGE" \
+              --arg author "$AUTHOR" \
+              --arg url "$URL" \
+              --arg timestamp "$TIMESTAMP" \
+              --argjson additions "$ADDITIONS" \
+              --argjson deletions "$DELETIONS" \
+              --argjson files "$FILES_CHANGED" \
+              '{
+                embeds: [{
+                  title: ("New commit on jobobby04/TachiyomiSY • `" + $short_sha + "`"),
+                  url: $url,
+                  color: 5814783,
+                  fields: [
+                    { name: "📝 Message",   value: $message,                                  inline: false },
+                    { name: "👤 Author",    value: $author,                                   inline: true  },
+                    { name: "📁 Files",     value: ($files | tostring),                       inline: true  },
+                    { name: "➕ Additions", value: ("+" + ($additions | tostring)),           inline: true  },
+                    { name: "➖ Deletions", value: ("-" + ($deletions | tostring)),           inline: true  },
+                    { name: "🔗 View",      value: ("[Open on GitHub](" + $url + ")"),        inline: false }
+                  ],
+                  footer: { text: "TachiyomiSY · master" },
+                  timestamp: $timestamp
+                }]
+              }')
+
+            curl -s -X POST "${{ secrets.DISCORD_WEBHOOK_URL }}" \
+              -H "Content-Type: application/json" \
+              -d "$PAYLOAD"
+
+            # Discord rate limiting
+            sleep 1
+          done
+
+      - name: Update stored SHA
+        if: steps.fetch.outputs.new_commits != '[]'
+        run: |
+          curl -s -X PATCH \
+            -H "Authorization: Bearer ${{ secrets.GH_PAT }}" \
+            -H "Accept: application/vnd.github+json" \
+            "https://api.github.com/repos/${{ github.repository }}/actions/variables/LAST_SEEN_SHA" \
+            -d "{\"name\":\"LAST_SEEN_SHA\",\"value\":\"${{ steps.fetch.outputs.latest_sha }}\"}"
