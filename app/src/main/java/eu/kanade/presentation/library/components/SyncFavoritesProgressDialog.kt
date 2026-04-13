@@ -170,7 +170,6 @@ fun SyncFavoritesProgressDialog(
                                 properties.text + "\n\n" + status.title
                             is FavoritesSyncStatus.Processing.AddingGalleryToLocal ->
                                 properties.text + "\n\n" + status.title
-                            else -> properties.text
                         },
                     )
                 }
