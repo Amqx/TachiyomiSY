@@ -2,6 +2,11 @@ package eu.kanade.presentation.more.onboarding
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -17,8 +22,6 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import soup.compose.material.motion.animation.materialSharedAxisX
-import soup.compose.material.motion.animation.rememberSlideDistance
 import tachiyomi.i18n.MR
 import tachiyomi.presentation.core.components.material.padding
 import tachiyomi.presentation.core.i18n.stringResource
@@ -29,7 +32,7 @@ fun OnboardingScreen(
     onComplete: () -> Unit,
     onRestoreBackup: () -> Unit,
 ) {
-    val slideDistance = rememberSlideDistance()
+    val motionScheme = MaterialTheme.motionScheme
 
     var currentStep by rememberSaveable { mutableIntStateOf(0) }
     val steps = remember {
@@ -76,9 +79,17 @@ fun OnboardingScreen(
             AnimatedContent(
                 targetState = currentStep,
                 transitionSpec = {
-                    materialSharedAxisX(
-                        forward = targetState > initialState,
-                        slideDistance = slideDistance,
+                    val forward = targetState > initialState
+                    slideInHorizontally(
+                        animationSpec = motionScheme.defaultSpatialSpec(),
+                        initialOffsetX = { if (forward) it / 3 else -it / 3 },
+                    ) + fadeIn(
+                        animationSpec = motionScheme.defaultEffectsSpec(),
+                    ) togetherWith slideOutHorizontally(
+                        animationSpec = motionScheme.defaultSpatialSpec(),
+                        targetOffsetX = { if (forward) -it / 3 else it / 3 },
+                    ) + fadeOut(
+                        animationSpec = motionScheme.defaultEffectsSpec(),
                     )
                 },
                 label = "stepContent",
