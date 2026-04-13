@@ -235,6 +235,7 @@ object HomeScreen : Screen() {
         val selected = tabNavigator.current::class == tab::class
         WideNavigationRailItem(
             selected = selected,
+            railExpanded = false,
             onClick = {
                 if (!selected) {
                     tabNavigator.current = tab
