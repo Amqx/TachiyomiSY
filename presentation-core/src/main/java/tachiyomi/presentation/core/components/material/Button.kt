@@ -67,8 +67,8 @@ fun Button(
     contentPadding: PaddingValues = M3ButtonDefaults.ContentPadding,
     content: @Composable RowScope.() -> Unit,
 ) {
-    val containerColor = colors.containerColor(enabled)
-    val contentColor = colors.contentColor(enabled)
+    val containerColor = if (enabled) colors.containerColor else colors.disabledContainerColor
+    val contentColor = if (enabled) colors.contentColor else colors.disabledContentColor
 
     Surface(
         onClick = onClick,
