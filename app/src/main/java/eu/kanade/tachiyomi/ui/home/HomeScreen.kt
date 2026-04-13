@@ -4,6 +4,8 @@ import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.layout.Box
@@ -16,8 +18,8 @@ import androidx.compose.material3.BadgedBox
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBarItem
-import androidx.compose.material3.NavigationRailItem
 import androidx.compose.material3.Text
+import androidx.compose.material3.WideNavigationRailItem
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
@@ -52,8 +54,6 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
-import soup.compose.material.motion.animation.materialFadeThroughIn
-import soup.compose.material.motion.animation.materialFadeThroughOut
 import tachiyomi.domain.library.service.LibraryPreferences
 import tachiyomi.i18n.MR
 import tachiyomi.presentation.core.components.material.NavigationBar
@@ -70,9 +70,6 @@ object HomeScreen : Screen() {
     private val showBottomNavEvent = Channel<Boolean>()
 
     @Suppress("ConstPropertyName")
-    private const val TabFadeDuration = 200
-
-    @Suppress("ConstPropertyName")
     private const val TabNavigatorKey = "HomeTabs"
 
     private val TABS = listOf(
@@ -86,6 +83,7 @@ object HomeScreen : Screen() {
     @Composable
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
+        val motionScheme = MaterialTheme.motionScheme
 
         // SY -->
         val scope = rememberCoroutineScope()
@@ -146,8 +144,8 @@ object HomeScreen : Screen() {
                         AnimatedContent(
                             targetState = tabNavigator.current,
                             transitionSpec = {
-                                materialFadeThroughIn(initialScale = 1f, durationMillis = TabFadeDuration) togetherWith
-                                    materialFadeThroughOut(durationMillis = TabFadeDuration)
+                                fadeIn(animationSpec = motionScheme.defaultEffectsSpec()) togetherWith
+                                    fadeOut(animationSpec = motionScheme.defaultEffectsSpec())
                             },
                             label = "tabContent",
                         ) {
@@ -235,8 +233,9 @@ object HomeScreen : Screen() {
         val navigator = LocalNavigator.currentOrThrow
         val scope = rememberCoroutineScope()
         val selected = tabNavigator.current::class == tab::class
-        NavigationRailItem(
+        WideNavigationRailItem(
             selected = selected,
+            railExpanded = false,
             onClick = {
                 if (!selected) {
                     tabNavigator.current = tab
@@ -253,7 +252,6 @@ object HomeScreen : Screen() {
                     overflow = TextOverflow.Ellipsis,
                 )
             },
-            alwaysShowLabel = /* SY --> */alwaysShowLabel, /* SY <-- */
         )
     }
 

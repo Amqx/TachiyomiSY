@@ -30,6 +30,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.tooling.preview.Preview
+import tachiyomi.presentation.core.components.material.LoadingIndicator
 
 /**
  * A combined [CircularProgressIndicator] that always rotates.
@@ -49,7 +50,7 @@ fun CombinedCircularProgressIndicator(
     ) { indeterminate ->
         if (indeterminate) {
             // Indeterminate
-            CircularProgressIndicator()
+            LoadingIndicator()
         } else {
             // Determinate
             val infiniteTransition = rememberInfiniteTransition(label = "infiniteRotation")

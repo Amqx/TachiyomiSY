@@ -27,10 +27,15 @@ then go back to upstream. I just personally couldn't stand these changes.
    - Latest (clones latest button)
    - Custom filter option (if source supports filter)
  - Get rid of large update harming sources warnings
+ - Full migration to M3E (or as much as I can as it releases)
+   - Currently implemented:
+     - Shapes
+     - Navigation bars/ rails
+     - Animations
+     - Buttons and colors
+     - Loading spinners
 
 
 ### To-do list/ Stuff I want to change
- - Either fully convert to Material 3 Expressive or fully revert to Material 3. Right now, SY is an
-   mix of both versions, causing it to look disjointed/ wrong in all the small nooks/ crannys.
  - If I run into anything during use that I dislike I will probably get rid of it.
  - If I run into anything during use that I want I will probably add it.

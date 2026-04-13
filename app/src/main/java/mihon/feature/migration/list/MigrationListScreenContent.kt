@@ -25,7 +25,6 @@ import androidx.compose.material.icons.outlined.CopyAll
 import androidx.compose.material.icons.outlined.Done
 import androidx.compose.material.icons.outlined.DoneAll
 import androidx.compose.material.icons.outlined.MoreVert
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
@@ -63,6 +62,7 @@ import tachiyomi.i18n.MR
 import tachiyomi.presentation.core.components.Badge
 import tachiyomi.presentation.core.components.BadgeGroup
 import tachiyomi.presentation.core.components.FastScrollLazyColumn
+import tachiyomi.presentation.core.components.material.LoadingIndicator
 import tachiyomi.presentation.core.components.material.Scaffold
 import tachiyomi.presentation.core.components.material.padding
 import tachiyomi.presentation.core.components.material.topSmallPaddingValues
@@ -263,7 +263,7 @@ fun MigrationListItemResult(
                         .aspectRatio(MangaCover.Book.ratio),
                     contentAlignment = Alignment.Center,
                 ) {
-                    CircularProgressIndicator()
+                    LoadingIndicator()
                 }
             }
             MigratingManga.SearchResult.NotFound -> {

@@ -4,6 +4,12 @@ import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.ContentTransform
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.animation.togetherWith
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.ProvidableCompositionLocal
 import androidx.compose.runtime.staticCompositionLocalOf
@@ -22,8 +28,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.plus
-import soup.compose.material.motion.animation.materialSharedAxisX
-import soup.compose.material.motion.animation.rememberSlideDistance
 
 /**
  * For invoking back press to the parent activity
@@ -65,13 +69,21 @@ fun DefaultNavigatorScreenTransition(
     navigator: Navigator,
     modifier: Modifier = Modifier,
 ) {
-    val slideDistance = rememberSlideDistance()
+    val motionScheme = MaterialTheme.motionScheme
     ScreenTransition(
         navigator = navigator,
         transition = {
-            materialSharedAxisX(
-                forward = navigator.lastEvent != StackEvent.Pop,
-                slideDistance = slideDistance,
+            val forward = navigator.lastEvent != StackEvent.Pop
+            slideInHorizontally(
+                animationSpec = motionScheme.defaultSpatialSpec(),
+                initialOffsetX = { if (forward) it / 3 else -it / 3 },
+            ) + fadeIn(
+                animationSpec = motionScheme.defaultEffectsSpec(),
+            ) togetherWith slideOutHorizontally(
+                animationSpec = motionScheme.defaultSpatialSpec(),
+                targetOffsetX = { if (forward) -it / 3 else it / 3 },
+            ) + fadeOut(
+                animationSpec = motionScheme.defaultEffectsSpec(),
             )
         },
         modifier = modifier,

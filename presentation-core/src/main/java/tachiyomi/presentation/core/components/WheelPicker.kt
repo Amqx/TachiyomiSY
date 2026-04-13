@@ -13,7 +13,6 @@ import androidx.compose.foundation.lazy.LazyListItemInfo
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.text.input.TextFieldLineLimits
@@ -256,7 +255,7 @@ object WheelPickerDefaults {
         androidx.compose.material3.Surface(
             modifier = Modifier
                 .size(size.width, size.height / ROW_COUNT),
-            shape = RoundedCornerShape(MaterialTheme.padding.medium),
+            shape = MaterialTheme.shapes.medium,
             color = MaterialTheme.colorScheme.primary.copy(alpha = 0.2f),
             border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary),
             content = {},

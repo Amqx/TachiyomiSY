@@ -36,6 +36,7 @@ import eu.kanade.tachiyomi.R
 import eu.kanade.tachiyomi.data.download.model.Download
 import tachiyomi.i18n.MR
 import tachiyomi.presentation.core.components.material.IconButtonTokens
+import tachiyomi.presentation.core.components.material.LoadingIndicator
 import tachiyomi.presentation.core.i18n.stringResource
 import tachiyomi.presentation.core.util.secondaryItemAlpha
 
@@ -134,12 +135,9 @@ private fun DownloadingIndicator(
             (downloadState == Download.State.DOWNLOADING && downloadProgress == 0)
         if (indeterminate) {
             arrowColor = strokeColor
-            CircularProgressIndicator(
+            LoadingIndicator(
                 modifier = IndicatorModifier,
                 color = strokeColor,
-                strokeWidth = IndicatorStrokeWidth,
-                trackColor = Color.Transparent,
-                strokeCap = StrokeCap.Butt,
             )
         } else {
             val animatedProgress by animateFloatAsState(
@@ -270,9 +268,6 @@ private fun Modifier.commonClickable(
 
 private val IndicatorSize = 26.dp
 private val IndicatorPadding = 2.dp
-
-// To match composable parameter name when used later
-private val IndicatorStrokeWidth = IndicatorPadding
 
 private val IndicatorModifier = Modifier
     .size(IndicatorSize)
