@@ -133,7 +133,7 @@ private fun DownloadingIndicator(
             (downloadState == Download.State.DOWNLOADING && downloadProgress == 0)
         if (indeterminate) {
             LoadingIndicator(
-                modifier = IndicatorModifier,
+                modifier = IndicatorModifier.size(IndicatorSize),
                 color = strokeColor,
             )
             Icon(
@@ -149,9 +149,9 @@ private fun DownloadingIndicator(
             )
             CircularWavyProgressIndicator(
                 progress = { animatedProgress },
-                modifier = IndicatorModifier,
+                modifier = IndicatorModifier.size(IndicatorSize),
                 color = strokeColor,
-                trackColor = Color.Transparent,
+                trackColor = MaterialTheme.colorScheme.surfaceContainerHighest,
             )
         }
         DropdownMenu(expanded = isMenuExpanded, onDismissRequest = { isMenuExpanded = false }) {
