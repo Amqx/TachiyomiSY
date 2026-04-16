@@ -127,27 +127,26 @@ private fun DownloadingIndicator(
             ),
         contentAlignment = Alignment.Center,
     ) {
-        val arrowColor: Color
         val strokeColor = MaterialTheme.colorScheme.onSurfaceVariant
         val downloadProgress = downloadProgressProvider()
         val indeterminate = downloadState == Download.State.QUEUE ||
             (downloadState == Download.State.DOWNLOADING && downloadProgress == 0)
         if (indeterminate) {
-            arrowColor = strokeColor
             LoadingIndicator(
                 modifier = IndicatorModifier,
                 color = strokeColor,
+            )
+            Icon(
+                imageVector = Icons.Outlined.ArrowDownward,
+                contentDescription = null,
+                modifier = ArrowModifier,
+                tint = strokeColor,
             )
         } else {
             val animatedProgress by animateFloatAsState(
                 targetValue = downloadProgress / 100f,
                 animationSpec = ProgressIndicatorDefaults.ProgressAnimationSpec,
             )
-            arrowColor = if (animatedProgress < 0.5f) {
-                strokeColor
-            } else {
-                MaterialTheme.colorScheme.background
-            }
             CircularWavyProgressIndicator(
                 progress = { animatedProgress },
                 modifier = IndicatorModifier,
@@ -171,12 +170,6 @@ private fun DownloadingIndicator(
                 },
             )
         }
-        Icon(
-            imageVector = Icons.Outlined.ArrowDownward,
-            contentDescription = null,
-            modifier = ArrowModifier,
-            tint = arrowColor,
-        )
     }
 }
 
