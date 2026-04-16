@@ -1,0 +1,65 @@
+package tachiyomi.presentation.core.components.material
+
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
+import androidx.compose.material3.WavyProgressIndicatorDefaults
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+
+/**
+ * Thin wrapper around the M3E determinate [androidx.compose.material3.LinearWavyProgressIndicator].
+ * Use when download progress percentage is known (1–99%).
+ */
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
+@Composable
+fun WavyLinearProgressIndicator(
+    progress: () -> Float,
+    modifier: Modifier = Modifier,
+    color: Color = WavyProgressIndicatorDefaults.indicatorColor,
+    trackColor: Color = WavyProgressIndicatorDefaults.trackColor,
+) {
+    androidx.compose.material3.LinearWavyProgressIndicator(
+        progress = progress,
+        modifier = modifier,
+        color = color,
+        trackColor = trackColor,
+    )
+}
+
+/**
+ * Thin wrapper around the M3E indeterminate [androidx.compose.material3.LinearWavyProgressIndicator].
+ * Use when a download is queued or at 0% (duration unknown).
+ */
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
+@Composable
+fun WavyLinearProgressIndicator(
+    modifier: Modifier = Modifier,
+    color: Color = WavyProgressIndicatorDefaults.indicatorColor,
+    trackColor: Color = WavyProgressIndicatorDefaults.trackColor,
+) {
+    androidx.compose.material3.LinearWavyProgressIndicator(
+        modifier = modifier,
+        color = color,
+        trackColor = trackColor,
+    )
+}
+
+/**
+ * Thin wrapper around the M3E determinate [androidx.compose.material3.CircularWavyProgressIndicator].
+ * Use when download progress percentage is known (1–99%).
+ */
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
+@Composable
+fun WavyCircularProgressIndicator(
+    progress: () -> Float,
+    modifier: Modifier = Modifier,
+    color: Color = WavyProgressIndicatorDefaults.indicatorColor,
+    trackColor: Color = WavyProgressIndicatorDefaults.trackColor,
+) {
+    androidx.compose.material3.CircularWavyProgressIndicator(
+        progress = progress,
+        modifier = modifier,
+        color = color,
+        trackColor = trackColor,
+    )
+}
