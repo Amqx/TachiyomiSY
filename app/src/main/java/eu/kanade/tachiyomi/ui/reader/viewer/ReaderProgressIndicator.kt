@@ -19,9 +19,8 @@ import eu.kanade.presentation.theme.TachiyomiTheme
 import tachiyomi.presentation.core.components.CombinedCircularProgressIndicator
 
 /**
- * A wrapper for [CircularProgressIndicator] that always rotates.
- *
- * By always rotating we give the feedback to the user that the application isn't 'stuck'.
+ * A wrapper for [CombinedCircularProgressIndicator] that shows a [LoadingIndicator] when
+ * progress is unknown and a [CircularWavyProgressIndicator] when progress is known.
  */
 class ReaderProgressIndicator @JvmOverloads constructor(
     context: Context,
