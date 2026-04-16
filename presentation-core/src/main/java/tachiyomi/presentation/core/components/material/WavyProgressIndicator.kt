@@ -7,12 +7,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 
 /**
- * Thin wrapper around the M3E determinate [androidx.compose.material3.LinearWavyProgressIndicator].
+ * Thin wrapper around the M3E determinate LinearWavyProgressIndicator.
  * Use when download progress percentage is known (1–99%).
+ *
+ * @see [androidx.compose.material3.LinearWavyProgressIndicator]
  */
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
-fun WavyLinearProgressIndicator(
+fun LinearWavyProgressIndicator(
     progress: () -> Float,
     modifier: Modifier = Modifier,
     color: Color = WavyProgressIndicatorDefaults.indicatorColor,
@@ -27,12 +29,14 @@ fun WavyLinearProgressIndicator(
 }
 
 /**
- * Thin wrapper around the M3E indeterminate [androidx.compose.material3.LinearWavyProgressIndicator].
+ * Thin wrapper around the M3E indeterminate LinearWavyProgressIndicator.
  * Use when a download is queued or at 0% (duration unknown).
+ *
+ * @see [androidx.compose.material3.LinearWavyProgressIndicator]
  */
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
-fun WavyLinearProgressIndicator(
+fun LinearWavyProgressIndicator(
     modifier: Modifier = Modifier,
     color: Color = WavyProgressIndicatorDefaults.indicatorColor,
     trackColor: Color = WavyProgressIndicatorDefaults.trackColor,
@@ -45,12 +49,14 @@ fun WavyLinearProgressIndicator(
 }
 
 /**
- * Thin wrapper around the M3E determinate [androidx.compose.material3.CircularWavyProgressIndicator].
+ * Thin wrapper around the M3E determinate CircularWavyProgressIndicator.
  * Use when download progress percentage is known (1–99%).
+ *
+ * @see [androidx.compose.material3.CircularWavyProgressIndicator]
  */
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
-fun WavyCircularProgressIndicator(
+fun CircularWavyProgressIndicator(
     progress: () -> Float,
     modifier: Modifier = Modifier,
     color: Color = WavyProgressIndicatorDefaults.indicatorColor,
