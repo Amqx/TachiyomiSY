@@ -441,9 +441,7 @@ private fun DownloadQueueRow(
             }
         }
 
-        if (progress == 100) {
-            // Download complete — indicator hidden; row will be removed by DownloadManager imminently
-        } else if (progress == 0 || pages == null) {
+        if (progress == 0 || pages == null) {
             LinearWavyProgressIndicator(
                 modifier = Modifier
                     .fillMaxWidth()
