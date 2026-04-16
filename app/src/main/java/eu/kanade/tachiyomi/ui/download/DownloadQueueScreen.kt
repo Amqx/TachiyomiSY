@@ -262,10 +262,10 @@ private fun DownloadQueueContent(
             }
         }
     }
-    val itemsState = remember { flatItems.toMutableStateList() }
+    val itemsState = remember(downloadList) { flatItems.toMutableStateList() }
 
     val lazyListState = rememberLazyListState()
-    val reorderableState = rememberReorderableLazyListState(lazyListState) { from, to ->
+    val reorderableState = rememberReorderableLazyListState(lazyListState, contentPadding) { from, to ->
         val fromItem = itemsState.getOrNull(from.index)
         val toItem = itemsState.getOrNull(to.index)
         if (fromItem is DownloadQueueItem.Row &&
@@ -441,7 +441,9 @@ private fun DownloadQueueRow(
             }
         }
 
-        if (progress == 0 || pages == null) {
+        if (progress == 100) {
+            // Download complete — indicator hidden; row will be removed by DownloadManager imminently
+        } else if (progress == 0 || pages == null) {
             LinearWavyProgressIndicator(
                 modifier = Modifier
                     .fillMaxWidth()
