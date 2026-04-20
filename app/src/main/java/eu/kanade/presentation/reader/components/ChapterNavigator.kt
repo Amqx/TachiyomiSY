@@ -3,7 +3,6 @@ package eu.kanade.presentation.reader.components
 import androidx.compose.foundation.background
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsDraggedAsState
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -14,12 +13,11 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.SkipNext
 import androidx.compose.material.icons.outlined.SkipPrevious
+import androidx.compose.material3.ButtonGroup
 import androidx.compose.material3.FilledIconButton
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
@@ -82,27 +80,21 @@ fun ChapterNavigator(
     val layoutDirection = if (isRtl) LayoutDirection.Rtl else LayoutDirection.Ltr
     val haptic = LocalHapticFeedback.current
 
-    // Match with toolbar background color set in ReaderActivity
-    val backgroundColor = MaterialTheme.colorScheme
-        .surfaceColorAtElevation(3.dp)
-        .copy(alpha = if (isSystemInDarkTheme()) 0.9f else 0.95f)
-    val buttonColor = IconButtonDefaults.filledIconButtonColors(
-        containerColor = backgroundColor,
-        disabledContainerColor = backgroundColor,
-    )
+    val prevInteractionSource = remember { MutableInteractionSource() }
+    val nextInteractionSource = remember { MutableInteractionSource() }
 
     // We explicitly handle direction based on the reader viewer rather than the system direction
     CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr) {
-        Row(
+        ButtonGroup(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = horizontalPadding),
-            verticalAlignment = Alignment.CenterVertically,
         ) {
             FilledIconButton(
                 enabled = if (isRtl) enabledNext else enabledPrevious,
                 onClick = if (isRtl) onNextChapter else onPreviousChapter,
-                colors = buttonColor,
+                interactionSource = prevInteractionSource,
+                modifier = Modifier.animateWidth(prevInteractionSource),
             ) {
                 Icon(
                     imageVector = Icons.Outlined.SkipPrevious,
@@ -118,7 +110,7 @@ fun ChapterNavigator(
                         modifier = Modifier
                             .weight(1f)
                             .clip(RoundedCornerShape(24.dp))
-                            .background(backgroundColor)
+                            .background(MaterialTheme.colorScheme.surfaceContainerHigh)
                             .padding(horizontal = 16.dp),
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
@@ -156,7 +148,8 @@ fun ChapterNavigator(
             FilledIconButton(
                 enabled = if (isRtl) enabledPrevious else enabledNext,
                 onClick = if (isRtl) onPreviousChapter else onNextChapter,
-                colors = buttonColor,
+                interactionSource = nextInteractionSource,
+                modifier = Modifier.animateWidth(nextInteractionSource),
             ) {
                 Icon(
                     imageVector = Icons.Outlined.SkipNext,
