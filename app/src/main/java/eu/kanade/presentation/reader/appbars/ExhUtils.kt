@@ -1,6 +1,8 @@
 package eu.kanade.presentation.reader.appbars
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -65,7 +67,12 @@ fun ExhUtils(
             .background(backgroundColor),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        AnimatedVisibility(visible = isVisible) {
+        val motionScheme = MaterialTheme.motionScheme
+        AnimatedVisibility(
+            visible = isVisible,
+            enter = expandVertically(animationSpec = motionScheme.defaultSpatialSpec()),
+            exit = shrinkVertically(animationSpec = motionScheme.defaultSpatialSpec()),
+        ) {
             Column {
                 Row(
                     Modifier
