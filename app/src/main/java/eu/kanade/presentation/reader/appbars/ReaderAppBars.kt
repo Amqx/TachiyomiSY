@@ -24,6 +24,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.VerticalFloatingToolbar
 import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -147,18 +148,23 @@ fun ReaderAppBars(
                 .padding(bottom = 48.dp, top = 120.dp)
                 .align(Alignment.TopStart),
         ) {
-            ChapterNavigator(
-                isRtl = isRtl,
-                onNextChapter = onNextChapter,
-                enabledNext = enabledNext,
-                onPreviousChapter = onPreviousChapter,
-                enabledPrevious = enabledPrevious,
-                currentPage = currentPage,
-                totalPages = totalPages,
-                onPageIndexChange = onPageIndexChange,
-                isVerticalSlider = true,
-                currentPageText = currentPageText,
-            )
+            VerticalFloatingToolbar(
+                expanded = true,
+                modifier = Modifier.fillMaxHeight(),
+            ) {
+                ChapterNavigator(
+                    isRtl = isRtl,
+                    onNextChapter = onNextChapter,
+                    enabledNext = enabledNext,
+                    onPreviousChapter = onPreviousChapter,
+                    enabledPrevious = enabledPrevious,
+                    currentPage = currentPage,
+                    totalPages = totalPages,
+                    onPageIndexChange = onPageIndexChange,
+                    isVerticalSlider = true,
+                    currentPageText = currentPageText,
+                )
+            }
         }
 
         AnimatedVisibility(
@@ -175,18 +181,23 @@ fun ReaderAppBars(
                 .padding(bottom = 48.dp, top = 120.dp)
                 .align(Alignment.TopEnd),
         ) {
-            ChapterNavigator(
-                isRtl = isRtl,
-                onNextChapter = onNextChapter,
-                enabledNext = enabledNext,
-                onPreviousChapter = onPreviousChapter,
-                enabledPrevious = enabledPrevious,
-                currentPage = currentPage,
-                totalPages = totalPages,
-                onPageIndexChange = onPageIndexChange,
-                isVerticalSlider = true,
-                currentPageText = currentPageText,
-            )
+            VerticalFloatingToolbar(
+                expanded = true,
+                modifier = Modifier.fillMaxHeight(),
+            ) {
+                ChapterNavigator(
+                    isRtl = isRtl,
+                    onNextChapter = onNextChapter,
+                    enabledNext = enabledNext,
+                    onPreviousChapter = onPreviousChapter,
+                    enabledPrevious = enabledPrevious,
+                    currentPage = currentPage,
+                    totalPages = totalPages,
+                    onPageIndexChange = onPageIndexChange,
+                    isVerticalSlider = true,
+                    currentPageText = currentPageText,
+                )
+            }
         }
         // SY <--
         Column(

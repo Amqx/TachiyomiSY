@@ -193,19 +193,9 @@ fun ChapterNavigatorVert(
             .padding(vertical = verticalPadding, horizontal = 8.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        // Match with toolbar background color set in ReaderActivity
-        val backgroundColor = MaterialTheme.colorScheme
-            .surfaceColorAtElevation(3.dp)
-            .copy(alpha = if (isSystemInDarkTheme()) 0.9f else 0.95f)
-
-        val buttonColor = IconButtonDefaults.filledIconButtonColors(
-            containerColor = backgroundColor,
-            disabledContainerColor = backgroundColor,
-        )
         FilledIconButton(
             enabled = enabledPrevious,
             onClick = onPreviousChapter,
-            colors = buttonColor,
         ) {
             Icon(
                 imageVector = Icons.Outlined.SkipPrevious,
@@ -218,8 +208,6 @@ fun ChapterNavigatorVert(
             Column(
                 modifier = Modifier
                     .weight(1f)
-                    .clip(RoundedCornerShape(24.dp))
-                    .background(backgroundColor)
                     .padding(vertical = 16.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
@@ -273,7 +261,6 @@ fun ChapterNavigatorVert(
         FilledIconButton(
             enabled = enabledNext,
             onClick = onNextChapter,
-            colors = buttonColor,
         ) {
             Icon(
                 imageVector = Icons.Outlined.SkipNext,
