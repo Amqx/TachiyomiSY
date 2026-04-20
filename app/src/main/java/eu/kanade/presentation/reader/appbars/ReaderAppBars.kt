@@ -1,7 +1,6 @@
 package eu.kanade.presentation.reader.appbars
 
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInHorizontally
@@ -31,7 +30,6 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalLayoutDirection
-import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import eu.kanade.presentation.reader.components.ChapterNavigator
@@ -41,9 +39,6 @@ import eu.kanade.tachiyomi.ui.reader.viewer.Viewer
 import eu.kanade.tachiyomi.ui.reader.viewer.pager.R2LPagerViewer
 import kotlinx.collections.immutable.ImmutableSet
 import tachiyomi.presentation.core.components.material.padding
-
-private val readerBarsSlideAnimationSpec = tween<IntOffset>(200)
-private val readerBarsFadeAnimationSpec = tween<Float>(150)
 
 // SY -->
 enum class NavBarType {
@@ -124,6 +119,7 @@ fun ReaderAppBars(
     // SY <--
 ) {
     val isRtl = viewer is R2LPagerViewer
+    val motionScheme = MaterialTheme.motionScheme
     val backgroundColor = MaterialTheme.colorScheme
         .surfaceColorAtElevation(3.dp)
         .copy(alpha = if (isSystemInDarkTheme()) 0.9f else 0.95f)
@@ -138,11 +134,11 @@ fun ReaderAppBars(
             visible = visible && navBarType == NavBarType.VerticalLeft,
             enter = slideInHorizontally(
                 initialOffsetX = { -it },
-                animationSpec = readerBarsSlideAnimationSpec,
+                animationSpec = motionScheme.defaultSpatialSpec(),
             ),
             exit = slideOutHorizontally(
                 targetOffsetX = { -it },
-                animationSpec = readerBarsSlideAnimationSpec,
+                animationSpec = motionScheme.defaultSpatialSpec(),
             ),
             modifier = modifierWithInsetsPadding
                 .padding(bottom = 48.dp, top = 120.dp)
@@ -171,11 +167,11 @@ fun ReaderAppBars(
             visible = visible && navBarType == NavBarType.VerticalRight,
             enter = slideInHorizontally(
                 initialOffsetX = { it },
-                animationSpec = readerBarsSlideAnimationSpec,
+                animationSpec = motionScheme.defaultSpatialSpec(),
             ),
             exit = slideOutHorizontally(
                 targetOffsetX = { it },
-                animationSpec = readerBarsSlideAnimationSpec,
+                animationSpec = motionScheme.defaultSpatialSpec(),
             ),
             modifier = modifierWithInsetsPadding
                 .padding(bottom = 48.dp, top = 120.dp)
@@ -208,12 +204,12 @@ fun ReaderAppBars(
                 visible = visible,
                 enter = slideInVertically(
                     initialOffsetY = { -it },
-                    animationSpec = readerBarsSlideAnimationSpec,
-                ) + fadeIn(animationSpec = readerBarsFadeAnimationSpec),
+                    animationSpec = motionScheme.defaultSpatialSpec(),
+                ) + fadeIn(animationSpec = motionScheme.defaultEffectsSpec()),
                 exit = slideOutVertically(
                     targetOffsetY = { -it },
-                    animationSpec = readerBarsSlideAnimationSpec,
-                ) + fadeOut(animationSpec = readerBarsFadeAnimationSpec),
+                    animationSpec = motionScheme.defaultSpatialSpec(),
+                ) + fadeOut(animationSpec = motionScheme.defaultEffectsSpec()),
             ) {
                 // SY -->
                 Column {
@@ -252,12 +248,12 @@ fun ReaderAppBars(
                 visible = visible,
                 enter = slideInVertically(
                     initialOffsetY = { it },
-                    animationSpec = readerBarsSlideAnimationSpec,
-                ) + fadeIn(animationSpec = readerBarsFadeAnimationSpec),
+                    animationSpec = motionScheme.defaultSpatialSpec(),
+                ) + fadeIn(animationSpec = motionScheme.defaultEffectsSpec()),
                 exit = slideOutVertically(
                     targetOffsetY = { it },
-                    animationSpec = readerBarsSlideAnimationSpec,
-                ) + fadeOut(animationSpec = readerBarsFadeAnimationSpec),
+                    animationSpec = motionScheme.defaultSpatialSpec(),
+                ) + fadeOut(animationSpec = motionScheme.defaultEffectsSpec()),
             ) {
                 Column(
                     verticalArrangement = Arrangement.spacedBy(MaterialTheme.padding.small),
