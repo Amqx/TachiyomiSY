@@ -9,11 +9,10 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.SkipNext
 import androidx.compose.material.icons.outlined.SkipPrevious
-import androidx.compose.material3.ButtonGroup
 import androidx.compose.material3.FilledIconButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -27,7 +26,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.graphics.graphicsLayer
@@ -80,21 +78,18 @@ fun ChapterNavigator(
     val layoutDirection = if (isRtl) LayoutDirection.Rtl else LayoutDirection.Ltr
     val haptic = LocalHapticFeedback.current
 
-    val prevInteractionSource = remember { MutableInteractionSource() }
-    val nextInteractionSource = remember { MutableInteractionSource() }
-
     // We explicitly handle direction based on the reader viewer rather than the system direction
     CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr) {
-        ButtonGroup(
+        Row(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = horizontalPadding),
+            verticalAlignment = Alignment.CenterVertically,
         ) {
             FilledIconButton(
                 enabled = if (isRtl) enabledNext else enabledPrevious,
                 onClick = if (isRtl) onNextChapter else onPreviousChapter,
-                interactionSource = prevInteractionSource,
-                modifier = Modifier.animateWidth(prevInteractionSource),
+                modifier = Modifier.size(36.dp),
             ) {
                 Icon(
                     imageVector = Icons.Outlined.SkipPrevious,
@@ -109,7 +104,6 @@ fun ChapterNavigator(
                     Row(
                         modifier = Modifier
                             .weight(1f)
-                            .clip(RoundedCornerShape(24.dp))
                             .background(MaterialTheme.colorScheme.surfaceContainerHigh)
                             .padding(horizontal = 16.dp),
                         verticalAlignment = Alignment.CenterVertically,
@@ -148,8 +142,7 @@ fun ChapterNavigator(
             FilledIconButton(
                 enabled = if (isRtl) enabledPrevious else enabledNext,
                 onClick = if (isRtl) onPreviousChapter else onNextChapter,
-                interactionSource = nextInteractionSource,
-                modifier = Modifier.animateWidth(nextInteractionSource),
+                modifier = Modifier.size(36.dp),
             ) {
                 Icon(
                     imageVector = Icons.Outlined.SkipNext,
@@ -180,15 +173,16 @@ fun ChapterNavigatorVert(
 
     val haptic = LocalHapticFeedback.current
 
-    Column(
+    Column (
         modifier = Modifier
             .fillMaxHeight()
-            .padding(vertical = verticalPadding, horizontal = 8.dp),
+            .padding(vertical = verticalPadding),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         FilledIconButton(
             enabled = enabledPrevious,
             onClick = onPreviousChapter,
+            modifier = Modifier.size(36.dp),
         ) {
             Icon(
                 imageVector = Icons.Outlined.SkipPrevious,
@@ -201,7 +195,8 @@ fun ChapterNavigatorVert(
             Column(
                 modifier = Modifier
                     .weight(1f)
-                    .padding(vertical = 16.dp),
+                    .padding(vertical = 16.dp)
+                    .background(MaterialTheme.colorScheme.surfaceContainerHigh),
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
                 // SY -->
@@ -254,6 +249,7 @@ fun ChapterNavigatorVert(
         FilledIconButton(
             enabled = enabledNext,
             onClick = onNextChapter,
+            modifier = Modifier.size(36.dp),
         ) {
             Icon(
                 imageVector = Icons.Outlined.SkipNext,

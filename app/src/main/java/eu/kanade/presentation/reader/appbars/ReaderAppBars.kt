@@ -22,6 +22,7 @@ import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.material3.HorizontalFloatingToolbar
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.VerticalFloatingToolbar
 import androidx.compose.material3.surfaceColorAtElevation
@@ -29,6 +30,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
@@ -127,6 +129,11 @@ fun ReaderAppBars(
     val modifierWithInsetsPadding = Modifier.systemBarsPadding()
 
     // SY -->
+    val verticalNavigatorHorizontalPadding = 8.dp
+    val verticalNavigatorHorizontalPaddingPx = with(LocalDensity.current) {
+        verticalNavigatorHorizontalPadding.roundToPx()
+    }
+
     BoxIgnoreLayoutDirection(
         Modifier.fillMaxWidth(),
     ) {
@@ -137,11 +144,11 @@ fun ReaderAppBars(
                 animationSpec = motionScheme.defaultSpatialSpec(),
             ),
             exit = slideOutHorizontally(
-                targetOffsetX = { -it },
+                targetOffsetX = { -(it + verticalNavigatorHorizontalPaddingPx) },
                 animationSpec = motionScheme.defaultSpatialSpec(),
             ),
             modifier = modifierWithInsetsPadding
-                .padding(bottom = 48.dp, top = 120.dp)
+                .padding(bottom = 48.dp, top = 120.dp, start = verticalNavigatorHorizontalPadding)
                 .align(Alignment.TopStart),
         ) {
             VerticalFloatingToolbar(
@@ -170,11 +177,11 @@ fun ReaderAppBars(
                 animationSpec = motionScheme.defaultSpatialSpec(),
             ),
             exit = slideOutHorizontally(
-                targetOffsetX = { it },
+                targetOffsetX = { it + verticalNavigatorHorizontalPaddingPx },
                 animationSpec = motionScheme.defaultSpatialSpec(),
             ),
             modifier = modifierWithInsetsPadding
-                .padding(bottom = 48.dp, top = 120.dp)
+                .padding(bottom = 48.dp, top = 120.dp, end = verticalNavigatorHorizontalPadding)
                 .align(Alignment.TopEnd),
         ) {
             VerticalFloatingToolbar(
@@ -256,22 +263,30 @@ fun ReaderAppBars(
                 ) + fadeOut(animationSpec = motionScheme.defaultEffectsSpec()),
             ) {
                 Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.spacedBy(MaterialTheme.padding.small),
                 ) {
                     // SY -->
                     if (navBarType == NavBarType.Bottom) { // <-- SY
-                        ChapterNavigator(
-                            isRtl = isRtl,
-                            onNextChapter = onNextChapter,
-                            enabledNext = enabledNext,
-                            onPreviousChapter = onPreviousChapter,
-                            enabledPrevious = enabledPrevious,
-                            currentPage = currentPage,
-                            totalPages = totalPages,
-                            onPageIndexChange = onPageIndexChange,
-                            isVerticalSlider = false,
-                            currentPageText = currentPageText,
-                        )
+                        HorizontalFloatingToolbar(
+                            expanded = true,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 8.dp)
+                        ) {
+                            ChapterNavigator(
+                                isRtl = isRtl,
+                                onNextChapter = onNextChapter,
+                                enabledNext = enabledNext,
+                                onPreviousChapter = onPreviousChapter,
+                                enabledPrevious = enabledPrevious,
+                                currentPage = currentPage,
+                                totalPages = totalPages,
+                                onPageIndexChange = onPageIndexChange,
+                                isVerticalSlider = false,
+                                currentPageText = currentPageText,
+                            )
+                        }
                     }
 
                     ReaderBottomBar(
