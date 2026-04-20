@@ -290,8 +290,6 @@ fun ReaderAppBars(
                         onClickShiftPage = onClickShiftPage,
                         // SY <--
                         modifier = Modifier
-                            .fillMaxWidth()
-                            .background(backgroundColor)
                             .padding(horizontal = MaterialTheme.padding.small)
                             .windowInsetsPadding(WindowInsets.navigationBars),
                     )
