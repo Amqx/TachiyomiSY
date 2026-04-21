@@ -1,4 +1,5 @@
 
+import com.android.build.api.dsl.ApplicationExtension
 import mihon.gradle.getBuildTime
 import mihon.gradle.getLatestCommitCount
 import mihon.gradle.getLatestCommitSha
@@ -24,7 +25,7 @@ if (gradle.startParameter.taskRequests.toString().contains("Standard")) {
     }
 }
 
-android {
+configure<ApplicationExtension> {
     namespace = "eu.kanade.tachiyomi"
 
     defaultConfig {
@@ -74,7 +75,7 @@ android {
     }
 
     sourceSets {
-        getByName("benchmark").res.srcDirs("src/debug/res")
+        getByName("benchmark").res.directories.add("src/debug/res")
     }
 
     splits {
@@ -139,7 +140,6 @@ android {
         aidl = true
 
         // Disable some unused things
-        renderScript = false
         shaders = false
     }
 

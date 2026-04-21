@@ -17,7 +17,7 @@ class PluginComposeAndroid : Plugin<Project> {
         }
 
         android {
-            buildFeatures {
+            buildFeatures.apply {
                 compose = true
             }
         }

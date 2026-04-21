@@ -10,18 +10,17 @@ import org.gradle.kotlin.dsl.dependencies
 
 fun Project.configureAndroid() {
     android {
-        defaultConfig {
+        defaultConfig.apply {
             minSdk = mihonx.versions.android.sdk.min.get().toInt()
             if (this is ApplicationDefaultConfig) {
                 targetSdk = mihonx.versions.android.sdk.target.get().toInt()
             }
-
-            ndkVersion = mihonx.versions.android.ndk.get()
         }
 
+        ndkVersion = mihonx.versions.android.ndk.get()
         compileSdk = mihonx.versions.android.sdk.compile.get().toInt()
 
-        compileOptions {
+        compileOptions.apply {
             isCoreLibraryDesugaringEnabled = true
         }
     }
