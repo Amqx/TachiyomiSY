@@ -13,14 +13,13 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.AbstractComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.core.view.isVisible
-import com.google.android.material.progressindicator.CircularProgressIndicator
 import eu.kanade.presentation.theme.TachiyomiTheme
 import tachiyomi.presentation.core.components.CombinedCircularProgressIndicator
 
 /**
- * A wrapper for [CircularProgressIndicator] that always rotates.
- *
- * By always rotating we give the feedback to the user that the application isn't 'stuck'.
+ * A wrapper for [CombinedCircularProgressIndicator] that shows a [LoadingIndicator][tachiyomi.presentation.core.components.material.LoadingIndicator]
+ * when progress is unknown and a [CircularWavyProgressIndicator][tachiyomi.presentation.core.components.material.CircularWavyProgressIndicator]
+ * when progress is known.
  */
 class ReaderProgressIndicator @JvmOverloads constructor(
     context: Context,
