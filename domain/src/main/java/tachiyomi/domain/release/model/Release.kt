@@ -9,8 +9,11 @@ data class Release(
     val version: String,
     val info: String,
     val releaseLink: String,
+    // SY -->
     private val assets: List<String>,
+    // SY <--
 ) {
+    // SY -->
 
     /**
      * Get download link of latest release from the assets.
@@ -34,4 +37,5 @@ data class Release(
      * Assets class containing download url.
      */
     data class Assets(val downloadLink: String)
+    // SY <--
 }

@@ -10,9 +10,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.outlined.ArrowForward
-import androidx.compose.material.icons.outlined.Error
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -22,6 +19,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import mihon.icons.materialsymbols.MaterialSymbols
+import mihon.icons.materialsymbols.automirroredrounded.ArrowForward
+import mihon.icons.materialsymbols.roundedfilled.Error
 import tachiyomi.i18n.MR
 import tachiyomi.presentation.core.components.material.LoadingIndicator
 import tachiyomi.presentation.core.components.material.padding
@@ -65,12 +65,14 @@ fun GlobalSearchResultItem(
                     text = title,
                     style = MaterialTheme.typography.titleMedium,
                 )
+                // SY -->
                 if (subtitle != null) {
                     Text(text = subtitle)
                 }
+                // SY <--
             }
             IconButton(onClick = onClick) {
-                Icon(imageVector = Icons.AutoMirrored.Outlined.ArrowForward, contentDescription = null)
+                Icon(imageVector = MaterialSymbols.AutoMirroredRounded.ArrowForward, contentDescription = null)
             }
         }
         content()
@@ -102,7 +104,7 @@ fun GlobalSearchErrorResultItem(message: String?) {
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
     ) {
-        Icon(imageVector = Icons.Outlined.Error, contentDescription = null)
+        Icon(imageVector = MaterialSymbols.RoundedFilled.Error, contentDescription = null)
         Spacer(Modifier.height(4.dp))
         Text(
             text = message ?: stringResource(MR.strings.unknown_error),
